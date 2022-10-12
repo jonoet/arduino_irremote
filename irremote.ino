@@ -1,5 +1,7 @@
 #include <IRremote.hpp>
 const int IR_RECEIVE_PIN=8;
+#define DELAY_AFTER_SEND 2000
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -9,7 +11,7 @@ void setup() {
   Serial.begin(9600);
   // Just to know which program is running on my Arduino
   Serial.println(F("Starting " __FILE__ " from " __DATE__ "\r\n\tUsing library version " VERSION_IRREMOTE));
-  
+  IrSender.begin(3); // Start with IR_SEND_PIN as send pin and enable feedback LED at default feedback LED pin
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK); // Start the receiver
 }
 
@@ -21,6 +23,7 @@ void loop() {
     IrReceiver.printIRResultShort(&Serial); // optional use new print version
     IrReceiver.resume(); // Enable receiving of the next value
   }
+
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
     String str = Serial.readString();  //read until timeout
@@ -28,6 +31,8 @@ void loop() {
     Serial.print("Received:[");
     Serial.print(str);
     Serial.println("]");
+    IrSender.sendNECRaw(0xF708BF40, 0); //new
+    delay(DELAY_AFTER_SEND);
   }
   delay(100);
 //  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
